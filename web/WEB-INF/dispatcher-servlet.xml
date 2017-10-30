@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"
+       xmlns:tx="http://www.springframework.org/schema/tx">
+
+
+    <context:component-scan base-package="com.webservice.awara"/>
+
+    <!-- Database Information -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url"
+                  value="jdbc:mysql://172.25.121.125:3306/myaso"/>
+        <property name="username" value="vadim"/>
+        <property name="password" value="vadim"/>
+    </bean>
+
+    <!-- Hibernate 4 SessionFactory Bean definition -->
+    <bean id="hibernate4AnnotatedSessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>com.webservice.awara.model.Material</value>
+                <value>com.webservice.awara.model.MaterialsGroup</value>
+                <value>com.webservice.awara.model.MaterialsType</value>
+                <value>com.webservice.awara.model.Operation</value>
+                <value>com.webservice.awara.model.OperationType</value>
+                <value>com.webservice.awara.model.QType</value>
+                <value>com.webservice.awara.model.Shop</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--Dao & Service beans-->
+    <bean id="materialDao" class="com.webservice.awara.dao.MaterialDaoImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="materialService" class="com.webservice.awara.service.MaterialServiceImpl">
+        <property name="materialDao" ref="materialDao"/>
+    </bean>
+
+    <bean id="operationDao" class="com.webservice.awara.dao.OperationDaoImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="operationService" class="com.webservice.awara.service.OperationServiceImpl">
+        <property name="operationDao" ref="operationDao"/>
+    </bean>
+
+    <bean id="shopDao" class="com.webservice.awara.dao.ShopDaoImpl">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="shopService" class="com.webservice.awara.service.ShopServiceImpl">
+        <property name="shopDao" ref="shopDao"/>
+    </bean>
+
+    <mvc:annotation-driven />
+    <mvc:default-servlet-handler/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+</beans>
